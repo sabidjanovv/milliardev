@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mongodb:
+    container_name: mongodb
+    image: mongo:4.4
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-data:/data/db
+
+  app:
+    container_name: milliardev
+    image: sabidjanovv/milliardev
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+      - "3011:3011"
+    environment:
+      - PORT=3001
+      - MONGO_URI=mongodb://mongodb:27017/milliardev
+    env_file:
+      - .env

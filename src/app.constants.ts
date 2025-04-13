@@ -1,0 +1,1 @@
+export const BOT_NAME = 'Milliard Dev bot';
