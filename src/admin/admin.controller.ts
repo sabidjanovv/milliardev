@@ -9,7 +9,7 @@ import {
   Request,
   Query,
   Delete,
-  UseGuards,
+  UseGuards,Req
 } from '@nestjs/common';
 import { Response } from 'express';
 import {
@@ -86,7 +86,7 @@ export class AdminController {
   }
 
   @Patch(':id')
-  @UseGuards(CreatorGuard)
+  @UseGuards(AuthGuard('jwt'), CreatorGuard)
   @ApiOperation({ summary: 'Adminni yangilash' })
   @ApiParam({
     name: 'id',
@@ -94,8 +94,11 @@ export class AdminController {
   })
   @ApiResponse({ status: 200, description: 'Admin muvaffaqiyatli yangilandi.' })
   @ApiResponse({ status: 400, description: 'Xatolik yuz berdi.' })
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminService.update(id, updateAdminDto);
+  update(@Param('id') id: string, @Req() req, @Body() updateAdminDto: UpdateAdminDto) {
+    const is_creator = req.user.is_creator
+    const updaterAdminId = req.user.id;
+    console.log(is_creator);
+    return this.adminService.update(id, updateAdminDto, is_creator, updaterAdminId);
   }
 
   @Delete(':id')

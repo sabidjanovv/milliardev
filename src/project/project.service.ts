@@ -84,7 +84,11 @@ export class ProjectService {
     });
   }
 
-  async update(id: string, updateProjectDto: UpdateProjectDto, adminId: string) {
+  async update(
+    id: string,
+    updateProjectDto: UpdateProjectDto,
+    adminId: string,
+  ) {
     const updatedProject = await this.projectModel
       .findByIdAndUpdate(id, updateProjectDto, { new: true })
       .exec();
@@ -94,7 +98,7 @@ export class ProjectService {
     }
 
     updatedProject.updaterAdminId = adminId;
-    updatedProject.save();
+    await updatedProject.save();
 
     return createApiResponse(200, 'Proyekt muvaffaqiyatli yangilandi', {
       payload: updatedProject,

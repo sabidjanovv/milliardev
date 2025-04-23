@@ -6,13 +6,13 @@ export type ProjectDocument = Project & Document;
 
 @Schema({ versionKey: false })
 export class Project {
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   name: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   description: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   link: string;
 
   @Prop({ type: String, required: false, default: null })
@@ -23,6 +23,12 @@ export class Project {
 
   @Prop({ type: String, ref: 'Admin', required: false, default: null })
   updaterAdminId: string;
+
+  @Prop({ type: String, ref: 'Customer', required: true })
+  customerId: string;
+
+  @Prop({ type: Boolean, default: false })
+  is_done: boolean;
 
   @Prop({ type: String })
   createdAt: string;

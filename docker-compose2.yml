@@ -24,3 +24,5 @@ services:
       - MONGO_URI=mongodb://mongodb:27017/milliardev
     env_file:
       - .env
+    volumes:
+      - ./uploads:/app/uploads

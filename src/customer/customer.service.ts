@@ -10,15 +10,17 @@ import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { Customer, CustomerDocument } from './schemas/customer.schema';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { createApiResponse } from '../common/utils/api-response';
+import { Project, ProjectDocument } from '../project/schemas/project.schema';
 
 @Injectable()
 export class CustomerService {
   constructor(
     @InjectModel(Customer.name)
     private readonly customerModel: Model<CustomerDocument>,
+    @InjectModel(Project.name)
+    private readonly projectModel: Model<ProjectDocument>,
   ) {}
 
-  // Yangi mijoz qo'shish
   async create(createCustomerDto: CreateCustomerDto) {
     const newCustomer = await this.customerModel.create(createCustomerDto);
     return createApiResponse(201, 'Mijoz muvaffaqiyatli yaratildi', {
@@ -30,11 +32,16 @@ export class CustomerService {
   async findAll(paginationDto: PaginationDto) {
     const limit = Number(paginationDto.limit ?? 10);
     const page = Number(paginationDto.page ?? 1);
-    const { email, phone_number, fromDate, toDate } = paginationDto;
+    const { email, phone_number, fromDate, toDate, is_active, is_done } =
+      paginationDto;
     const filter: any = {};
     if (email) filter.email = { $regex: email, $options: 'i' };
     if (phone_number)
       filter.phone_number = { $regex: phone_number, $options: 'i' };
+
+    if (typeof is_active === 'boolean') {
+      filter.is_active = is_active;
+    }
 
     if (fromDate || toDate) {
       if (fromDate && !/^\d{4}-\d{2}-\d{2}$/.test(fromDate)) {
@@ -51,6 +58,27 @@ export class CustomerService {
       filter.createdAt = {};
       if (fromDate) filter.createdAt.$gte = `${fromDate} 00:00:00`;
       if (toDate) filter.createdAt.$lte = `${toDate} 23:59:59`;
+    }
+
+    if (typeof is_done === 'boolean') {
+      // Projectlar orqali yakunlangan mijozlarni topamiz
+      const customersWithProjects = await this.projectModel.aggregate([
+        {
+          $group: {
+            _id: '$customerId',
+            allDone: { $min: '$is_done' }, // Agar bironta ham `false` bo‘lsa, `allDone = false`
+          },
+        },
+        {
+          $match: {
+            allDone: is_done, // Bu joyda `true` yoki `false` filtrlash bo'ladi
+          },
+        },
+      ]);
+
+      const ids = customersWithProjects.map((c) => c._id);
+      // Faqat shu `ids` ichidagilarni qidiramiz
+      filter._id = { $in: ids };
     }
 
     const [customers, totalCount] = await Promise.all([

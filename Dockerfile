@@ -8,9 +8,6 @@ RUN npm install --legacy-peer-deps
 
 COPY . ./
 
-COPY cert/cert.pem cert.pem
-COPY cert/key.pem key.pem
-
 COPY .env .env 
 
 RUN npm run build

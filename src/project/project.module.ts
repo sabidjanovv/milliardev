@@ -13,6 +13,6 @@ import { MongooseModule } from '@nestjs/mongoose';
     JwtModule.register({}),
   ],
   controllers: [ProjectController],
-  providers: [ProjectService],
+  providers: [ProjectService, MongooseModule],
 })
 export class ProjectModule {}

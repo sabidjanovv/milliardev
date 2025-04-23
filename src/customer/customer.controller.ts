@@ -71,7 +71,19 @@ export class CustomerController {
     type: String,
     description: 'Mijozning telefon raqami',
   })
-  async findAll(paginationDto: PaginationDto) {
+  @ApiQuery({
+    name: 'is_active',
+    required: false,
+    type: Boolean,
+    description: 'active mijozlar',
+  })
+  @ApiQuery({
+    name: 'is_done',
+    required: false,
+    type: Boolean,
+    description: 'projectlari qilingan yoki qilinmagan mijozlar',
+  })
+  async findAll(@Query() paginationDto: PaginationDto) {
     return this.customerService.findAll(paginationDto);
   }
 

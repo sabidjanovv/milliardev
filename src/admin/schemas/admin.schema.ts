@@ -31,9 +31,6 @@ export class Admin {
   @Prop({ type: String, default: null })
   activation_link?: string;
 
-  @Prop({ type: String, required: false, ref: 'Admin', default: null })
-  adminId: string;
-
   @Prop({ type: String })
   createdAt: string;
 
@@ -42,16 +39,6 @@ export class Admin {
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin);
-
-// AdminSchema.index(
-//   { tel_secondary: 1 },
-//   {
-//     unique: true,
-//     partialFilterExpression: {
-//       tel_secondary: { $exists: true, $gt: '' },
-//     },
-//   },
-// );
 
 AdminSchema.pre('save', function (next) {
   if (!this.createdAt) {

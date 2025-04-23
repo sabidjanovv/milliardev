@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -157,18 +158,50 @@ export class AdminService {
     return createApiResponse(200, 'Admin topildi', admin);
   }
 
-  async update(id: string, updateAdminDto: UpdateAdminDto) {
+  async update(
+    id: string,
+    updateAdminDto: UpdateAdminDto,
+    is_creator: boolean,
+    updaterAdminId: string,
+  ) {
     const admin = await this.adminModel.findById(id);
 
     if (!admin) {
       throw new BadRequestException('Admin topilmadi');
     }
 
+    // Agar is_creator false bo‘lsa, faqat o‘zining ma’lumotini o‘zgartira oladi
+    if (!is_creator) {
+      // Faqat o‘zini yangilay oladi
+      if (id !== updaterAdminId) {
+        throw new ForbiddenException(
+          'Siz faqat o‘z profilingizni tahrirlashingiz mumkin',
+        );
+      }
+
+      // is_creator maydonini true qilib yubormoqchi bo‘lsa — xatolik
+      if (
+        updateAdminDto.hasOwnProperty('is_creator') &&
+        updateAdminDto.is_creator === true
+      ) {
+        throw new ForbiddenException(
+          'Siz is_creator maydonini o‘zgartira olmaysiz',
+        );
+      }
+    }
+
+    // Agar parol o‘zgartirilayotgan bo‘lsa, uni hash qilamiz
+    if (updateAdminDto.password) {
+      admin.hashed_password = await hash(updateAdminDto.password);
+    }
+    admin.save()
+
     const updatedAdmin = await this.adminModel.findByIdAndUpdate(
       id,
       updateAdminDto,
       {
         new: true,
+        runValidators: true,
       },
     );
 

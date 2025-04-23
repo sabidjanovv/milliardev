@@ -15,6 +15,8 @@ export class PaginationDto {
 
   @IsOptional()
   is_active?: boolean;
+  @IsOptional()
+  is_done?: boolean;
 
   @IsOptional()
   @IsString()

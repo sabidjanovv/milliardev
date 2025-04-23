@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class CreateProjectDto {
   @ApiProperty({ example: 'Ajoyib Loyihalar', description: 'Loyiha nomi' })
@@ -19,14 +19,25 @@ export class CreateProjectDto {
     example: 'https://github.com/awesome-project',
     description: 'Loyiha havolasi',
   })
-  @IsNotEmpty({ message: 'Loyiha havolasi majburiy' })
-  @IsUrl({}, { message: "Havola to'g'ri URL formatida bo'lishi kerak" })
-  link: string;
+  @IsOptional()
+  link?: string;
 
   @ApiProperty({
     description: 'Loyihaning rasmi',
     type: 'string',
     format: 'binary', // Swagger-specific to indicate a file upload
   })
+  @IsOptional()
   image?: string;
+
+  @ApiProperty({
+    example: 'bdjhawe2dbq23',
+    description: 'Loyiha qaysi mijozga tegishliligini bilish uchun ID kerak',
+  })
+  @IsNotEmpty({
+    message:
+      "Loyiha qaysi mijozga tegishliligini bilish uchun mijoz ID'sini kiriting",
+  })
+  @IsString({ message: "Tavsif satr bo'lishi kerak" })
+  customerId?: string;
 }

@@ -6,16 +6,16 @@
 
 // @Schema({ versionKey: false })
 // export class Customer {
-//   @Prop({ required: false, unique: true })
+//   @Prop({ required: false })
 //   username: string;
 
-//   @Prop({ required: false, unique: true })
+//   @Prop({ required: false })
 //   tg_id: string;
 
-//   @Prop({ required: false, unique: true })
+//   @Prop({ required: false })
 //   phone_number: string;
 
-//   @Prop({ required: false, unique: true })
+//   @Prop({ required: false })
 //   email: string;
 
 //   @Prop()
@@ -106,16 +106,16 @@ export type CustomerDocument = Customer & Document;
 
 @Schema({ versionKey: false })
 export class Customer {
-  @Prop({ required: false, unique: true })
+  @Prop({ required: false })
   username: string;
 
-  @Prop({ required: false, unique: true })
+  @Prop({ required: false })
   tg_id: string;
 
-  @Prop({ required: false, unique: true })
+  @Prop({ required: false })
   phone_number: string;
 
-  @Prop({ required: false, unique: true })
+  @Prop({ required: false })
   email: string;
 
   @Prop()
@@ -135,9 +135,37 @@ export class Customer {
 
   @Prop()
   updatedAt: string;
+
+  @Prop({
+    type: String,
+    enum: ['first_name', 'last_name', 'email'],
+    default: 'first_name',
+  })
+  current_step: 'first_name' | 'last_name' | 'email' | null;
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);
+
+CustomerSchema.index(
+  { username: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      username: { $exists: true, $gt: '' },
+    },
+  },
+);
+
+CustomerSchema.index(
+  { tg_id: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      tg_id: { $exists: true, $gt: '' },
+    },
+  },
+);
+
 
 CustomerSchema.pre('save', function (next) {
   if (!this.createdAt) {

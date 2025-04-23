@@ -25,8 +25,15 @@ export class BotService {
   private isTextMessage(
     message: any,
   ): message is Context['message'] & { text: string } {
+    console.log(message);
     return 'text' in message;
   }
+
+  // private isTextMessage(
+  //   message: any,
+  // ): message is Context['message'] & { text: string } {
+  //   return message && 'text' in message;
+  // }
 
   private async findUser(userId: number) {
     return this.botModel.findOne({ user_id: userId });
@@ -175,6 +182,32 @@ export class BotService {
     this.askForConfirmation(ctx, user.lang);
   }
 
+  // async askForConfirmation(ctx: Context, language: string) {
+  //   const messages = {
+  //     uz: "Bizga qiziqqaningiz uchun raxmat, siz bilan bog'lanishimizni xohlaysizmi?",
+  //     ru: 'Спасибо за ваш интерес, хотите ли вы, чтобы мы с вами связались?',
+  //     en: 'Thank you for your interest, would you like us to contact you?',
+  //   };
+
+  //   const buttonMessages = {
+  //     uz: ['Ha', "Yo'q"],
+  //     ru: ['Да', 'Нет'],
+  //     en: ['Yes', 'No'],
+  //   };
+
+  //   return await ctx.reply(messages[language] || messages['uz'], {
+  //     parse_mode: 'HTML',
+  //     reply_markup: {
+  //       inline_keyboard: [
+  //         [
+  //           { text: buttonMessages[language][0], callback_data: 'yes' },
+  //           { text: buttonMessages[language][1], callback_data: 'no' },
+  //         ],
+  //       ],
+  //     },
+  //   });
+  // }
+
   async askForConfirmation(ctx: Context, language: string) {
     const messages = {
       uz: "Bizga qiziqqaningiz uchun raxmat, siz bilan bog'lanishimizni xohlaysizmi?",
@@ -188,16 +221,13 @@ export class BotService {
       en: ['Yes', 'No'],
     };
 
+    const buttons = buttonMessages[language] || buttonMessages['uz'];
+
     return await ctx.reply(messages[language] || messages['uz'], {
       parse_mode: 'HTML',
-      reply_markup: {
-        inline_keyboard: [
-          [
-            { text: buttonMessages[language][0], callback_data: 'yes' },
-            { text: buttonMessages[language][1], callback_data: 'no' },
-          ],
-        ],
-      },
+      reply_markup: Markup.keyboard([[buttons[0], buttons[1]]])
+        .oneTime()
+        .resize().reply_markup,
     });
   }
 
@@ -226,29 +256,19 @@ export class BotService {
   }
 
   async askForFirstName(ctx: Context, language: string) {
-    const firstNameMessage = await this.getLocalizedMessage(
-      language,
-      'askForFirstName',
-    );
-    await ctx.reply(firstNameMessage);
+    const message = await this.getLocalizedMessage(language, 'askForFirstName');
+    await ctx.reply(message);
   }
 
   async askForLastName(ctx: Context, language: string) {
-    const lastNameMessage = await this.getLocalizedMessage(
-      language,
-      'askForLastName',
-    );
-    await ctx.reply(lastNameMessage);
+    const message = await this.getLocalizedMessage(language, 'askForLastName');
+    await ctx.reply(message);
   }
 
   async askForEmail(ctx: Context, language: string) {
-    const emailMessage = await this.getLocalizedMessage(
-      language,
-      'askForEmail',
-    );
-    await ctx.reply(emailMessage); // To'g'ri xabarni yuborish
+    const message = await this.getLocalizedMessage(language, 'askForEmail');
+    await ctx.reply(message);    
   }
-
   async handleNoContact(ctx: Context, language: string) {
     const noMassage = await this.getLocalizedMessage(
       language,
@@ -299,6 +319,8 @@ export class BotService {
       },
     };
 
+    console.log(messages);
+    
     return (
       messages[language]?.[key] || messages['uz'][key] || 'Message not found'
     );

@@ -47,7 +47,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
-
+import * as express from 'express';
 async function start() {
   try {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -58,9 +58,7 @@ async function start() {
     app.setGlobalPrefix('api');
 
     // Static fayllarni sozlash
-    app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-      prefix: '/uploads', // URL orqali kirish uchun
-    });
+    app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
 
     // CORSni faollashtirish
     app.enableCors();

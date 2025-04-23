@@ -39,7 +39,7 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post()
-  @UseGuards(AuthGuard('jwt'), AdminGuard) // JWT autentifikatsiyasi
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Loyiha yaratish' })
   @ApiConsumes('multipart/form-data')
@@ -76,7 +76,7 @@ export class ProjectController {
     if (file) {
       createProjectDto.image = file.filename; // Fayl nomini DTOga saqlash
     }
-    const adminId = req.user.id; // Admin IDni olish
+    const adminId = req.user.id; 
     return this.projectService.create(createProjectDto, adminId, file); // Admin ID bilan loyihani yaratish
   }
 
@@ -114,7 +114,7 @@ export class ProjectController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'), AdminGuard) // JWT autentifikatsiyasi
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'ID bo‘yicha loyihani yangilash' })
   @ApiParam({ name: 'id', type: 'string' })
@@ -143,39 +143,33 @@ export class ProjectController {
     @Request() req,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    // Mavjud loyihani olish
     const existingProject = await this.projectService.findOne(id);
 
-    // Loyihaning mavjud emasligini tekshirish
     if (!existingProject) {
       throw new NotFoundException('Bunday IDga ega loyiha topilmadi');
     }
 
-    // Agar eski rasm bo‘lsa, uni o‘chirish
-    if (existingProject.data?.payload.image) {
-      const oldImagePath = `./uploads/${existingProject.data.payload.image}`;
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath); // Eski rasmini o‘chirish
-      } else {
-        console.log('Fayl topilmadi:', oldImagePath);
-      }
-    }
-
-    // Yangi rasm yuklangan bo‘lsa, uni saqlash
     if (file) {
-      updateProjectDto['image'] = file.filename; // Faqat fayl nomini saqlash
-    } else {
-      // Yangi rasm yuklanmasa, eski rasmani saqlash
-      updateProjectDto['image'] = existingProject.data?.payload.image;
+      
+      if (existingProject.data?.payload.image) {
+        const oldImagePath = `./uploads/${existingProject.data.payload.image}`;
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        } else {
+          console.log('Fayl topilmadi:', oldImagePath);
+        }
+      }
+      updateProjectDto.image = file.filename;
     }
-    // Admin IDni olish
-    const adminId = req.user.id; // Admin IDni olish
 
-    return this.projectService.update(id, updateProjectDto, adminId); // Yangilash uchun servisga yuborish
+    
+    const adminId = req.user.id; 
+
+    return this.projectService.update(id, updateProjectDto, adminId); 
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'), AdminGuard) // JWT autentifikatsiyasi
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'ID bo‘yicha loyihani o‘chirish' })
   @ApiParam({ name: 'id', type: 'string' })
