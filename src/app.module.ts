@@ -10,17 +10,18 @@ import { CustomerModule } from './customer/customer.module';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { BotModule } from './bot/bot.module';
 import { ServicesModule } from './services/services.module';
+import { TelegramModule } from './telegram/telegram.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     TelegrafModule.forRootAsync({
       useFactory: async (configService: ConfigService) => {
-        const botToken = configService.get('BOT_TOKEN'); 
+        const botToken = configService.get('BOT_TOKEN');
         console.log(botToken);
-        
+
         if (!botToken) {
-          throw new Error('BOT_TOKEN is not defined in .env file'); 
+          throw new Error('BOT_TOKEN is not defined in .env file');
         }
         return {
           token: botToken, // faqat string qaytariladi
@@ -39,6 +40,7 @@ import { ServicesModule } from './services/services.module';
     CustomerModule,
     BotModule,
     ServicesModule,
+    TelegramModule,
   ],
   controllers: [],
   providers: [],
