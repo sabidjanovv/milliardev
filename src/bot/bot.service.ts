@@ -319,7 +319,6 @@ export class BotService {
       },
     };
 
-    console.log(messages);
     
     return (
       messages[language]?.[key] || messages['uz'][key] || 'Message not found'

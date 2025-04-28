@@ -35,13 +35,54 @@ export class ProjectService {
     });
   }
 
+  // async findAll(paginationDto: PaginationDto) {
+  //   const limit = paginationDto.limit ?? 20;
+  //   const page = paginationDto.page ?? 1;
+  //   const fromDate = paginationDto.fromDate;
+  //   const toDate = paginationDto.toDate;
+  //   const filter: any = {};
+
+  //   if (fromDate || toDate) {
+  //     if (fromDate && !/^\d{4}-\d{2}-\d{2}$/.test(fromDate)) {
+  //       throw new BadRequestException(
+  //         'fromDate format xato. Iltimos YYYY-MM-DD shaklida kiriting',
+  //       );
+  //     }
+  //     if (toDate && !/^\d{4}-\d{2}-\d{2}$/.test(toDate)) {
+  //       throw new BadRequestException(
+  //         'toDate format xato. Iltimos YYYY-MM-DD shaklida kiriting',
+  //       );
+  //     }
+
+  //     filter.createdAt = {};
+  //     if (fromDate) filter.createdAt.$gte = `${fromDate} 00:00:00`;
+  //     if (toDate) filter.createdAt.$lte = `${toDate} 23:59:59`;
+  //   }
+  //   const totalCount = await this.projectModel.countDocuments(filter);
+  //   const projects = await this.projectModel
+  //     .find(filter)
+  //     .sort({ _id: 'desc' })
+  //     .limit(limit)
+  //     .skip((page - 1) * limit)
+  //     .exec();
+
+  //   return createApiResponse(200, "Barcha proyektlar ro'yxati", {
+  //     payload: projects,
+  //     total: totalCount,
+  //     limit,
+  //     page,
+  //   });
+  // }
+
   async findAll(paginationDto: PaginationDto) {
     const limit = paginationDto.limit ?? 20;
     const page = paginationDto.page ?? 1;
     const fromDate = paginationDto.fromDate;
     const toDate = paginationDto.toDate;
+    const isDone = paginationDto.is_done; // is_done qiymatini oling
     const filter: any = {};
 
+    // fromDate va toDate tekshirish
     if (fromDate || toDate) {
       if (fromDate && !/^\d{4}-\d{2}-\d{2}$/.test(fromDate)) {
         throw new BadRequestException(
@@ -58,6 +99,12 @@ export class ProjectService {
       if (fromDate) filter.createdAt.$gte = `${fromDate} 00:00:00`;
       if (toDate) filter.createdAt.$lte = `${toDate} 23:59:59`;
     }
+
+    // is_done qiymati borligini tekshirish
+    if (isDone !== undefined) {
+      filter.is_done = isDone; // is_done ni filterga qo'shish
+    }
+
     const totalCount = await this.projectModel.countDocuments(filter);
     const projects = await this.projectModel
       .find(filter)

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { Customer, CustomerDocument } from './schemas/customer.schema';
@@ -29,19 +29,159 @@ export class CustomerService {
   }
 
   // Barcha mijozlarni olish
+  // async findAll(paginationDto: PaginationDto) {
+  //   const limit = Number(paginationDto.limit ?? 10);
+  //   const page = Number(paginationDto.page ?? 1);
+  //   const { email, phone_number, fromDate, toDate, is_active, is_done } =
+  //     paginationDto;
+  //   const filter: any = {};
+  //   if (email) filter.email = { $regex: email, $options: 'i' };
+  //   if (phone_number)
+  //     filter.phone_number = { $regex: phone_number, $options: 'i' };
+
+  //   if (typeof is_active === 'boolean') {
+  //     filter.is_active = is_active;
+  //   }
+
+  //   if (fromDate || toDate) {
+  //     if (fromDate && !/^\d{4}-\d{2}-\d{2}$/.test(fromDate)) {
+  //       throw new BadRequestException(
+  //         'fromDate formati noto‘g‘ri. YYYY-MM-DD formatida bo‘lishi kerak',
+  //       );
+  //     }
+  //     if (toDate && !/^\d{4}-\d{2}-\d{2}$/.test(toDate)) {
+  //       throw new BadRequestException(
+  //         'toDate formati noto‘g‘ri. YYYY-MM-DD formatida bo‘lishi kerak',
+  //       );
+  //     }
+
+  //     filter.createdAt = {};
+  //     if (fromDate) filter.createdAt.$gte = `${fromDate} 00:00:00`;
+  //     if (toDate) filter.createdAt.$lte = `${toDate} 23:59:59`;
+  //   }
+
+  //   if (typeof is_done === 'boolean') {
+  //     // Projectlar orqali yakunlangan mijozlarni topamiz
+  //     const customersWithProjects = await this.projectModel.aggregate([
+  //       {
+  //         $group: {
+  //           _id: '$customerId',
+  //           allDone: { $min: '$is_done' }, // Agar bironta ham `false` bo‘lsa, `allDone = false`
+  //         },
+  //       },
+  //       {
+  //         $match: {
+  //           allDone: is_done, // Bu joyda `true` yoki `false` filtrlash bo'ladi
+  //         },
+  //       },
+  //     ]);
+
+  //     const ids = customersWithProjects.map((c) => c._id);
+  //     // Faqat shu `ids` ichidagilarni qidiramiz
+  //     filter._id = { $in: ids };
+  //   }
+
+  //   const [customers, totalCount] = await Promise.all([
+  //     this.customerModel
+  //       .find(filter)
+  //       .sort({ _id: 'desc' })
+  //       .limit(limit)
+  //       .skip((page - 1) * limit),
+  //     this.customerModel.countDocuments(filter),
+  //   ]);
+
+  //   return createApiResponse(200, "Mijozlar ro'yxati muvaffaqiyatli olingan", {
+  //     payload: customers,
+  //     total: totalCount,
+  //     limit,
+  //     page,
+  //   });
+  // }
+
+  // async findAll(paginationDto: PaginationDto) {
+  //   const limit = Number(paginationDto.limit ?? 10);
+  //   const page = Number(paginationDto.page ?? 1);
+  //   const { email, phone_number, fromDate, toDate, is_active, is_done } =
+  //     paginationDto;
+
+  //   const filter: any = {};
+
+  //   if (email) filter.email = { $regex: email, $options: 'i' };
+  //   if (phone_number)
+  //     filter.phone_number = { $regex: phone_number, $options: 'i' };
+
+  //   if (typeof is_active === 'boolean') {
+  //     filter.is_active = is_active;
+  //   }
+
+  //   if (fromDate || toDate) {
+  //     if (fromDate && !/^\d{4}-\d{2}-\d{2}$/.test(fromDate)) {
+  //       throw new BadRequestException(
+  //         'fromDate formati noto‘g‘ri. YYYY-MM-DD formatida bo‘lishi kerak',
+  //       );
+  //     }
+  //     if (toDate && !/^\d{4}-\d{2}-\d{2}$/.test(toDate)) {
+  //       throw new BadRequestException(
+  //         'toDate formati noto‘g‘ri. YYYY-MM-DD formatida bo‘lishi kerak',
+  //       );
+  //     }
+
+  //     filter.createdAt = {};
+  //     if (fromDate) filter.createdAt.$gte = `${fromDate} 00:00:00`;
+  //     if (toDate) filter.createdAt.$lte = `${toDate} 23:59:59`;
+  //   }
+
+  //   if (typeof is_done === 'boolean') {
+  //     // is_done true yoki false bo'lishiga qarab customerId larni olish
+  //     const projects = await this.projectModel.aggregate([
+  //       {
+  //         $match: { is_done: is_done },
+  //       },
+  //       {
+  //         $group: {
+  //           _id: '$customerId',
+  //         },
+  //       },
+  //     ]);
+
+  //     const customerIds = projects.map((p) => p._id); // customerId lar string
+
+  //     // String id larni ObjectId ga aylantirib filter qilish
+  //     filter._id = { $in: customerIds.map((id) => new Types.ObjectId(id)) };
+  //   }
+
+  //   const [customers, totalCount] = await Promise.all([
+  //     this.customerModel
+  //       .find(filter)
+  //       .sort({ _id: 'desc' })
+  //       .limit(limit)
+  //       .skip((page - 1) * limit),
+  //     this.customerModel.countDocuments(filter),
+  //   ]);
+
+  //   return createApiResponse(200, "Mijozlar ro'yxati muvaffaqiyatli olingan", {
+  //     payload: customers,
+  //     total: totalCount,
+  //     limit,
+  //     page,
+  //   });
+  // }
+
   async findAll(paginationDto: PaginationDto) {
     const limit = Number(paginationDto.limit ?? 10);
     const page = Number(paginationDto.page ?? 1);
-    const { email, phone_number, fromDate, toDate, is_active, is_done } =
-      paginationDto;
+    const { email, phone_number, fromDate, toDate, is_active } = paginationDto;
+
     const filter: any = {};
+
     if (email) filter.email = { $regex: email, $options: 'i' };
     if (phone_number)
       filter.phone_number = { $regex: phone_number, $options: 'i' };
 
-    if (typeof is_active === 'boolean') {
+    if (is_active !== undefined) {
       filter.is_active = is_active;
     }
+
 
     if (fromDate || toDate) {
       if (fromDate && !/^\d{4}-\d{2}-\d{2}$/.test(fromDate)) {
@@ -60,27 +200,6 @@ export class CustomerService {
       if (toDate) filter.createdAt.$lte = `${toDate} 23:59:59`;
     }
 
-    if (typeof is_done === 'boolean') {
-      // Projectlar orqali yakunlangan mijozlarni topamiz
-      const customersWithProjects = await this.projectModel.aggregate([
-        {
-          $group: {
-            _id: '$customerId',
-            allDone: { $min: '$is_done' }, // Agar bironta ham `false` bo‘lsa, `allDone = false`
-          },
-        },
-        {
-          $match: {
-            allDone: is_done, // Bu joyda `true` yoki `false` filtrlash bo'ladi
-          },
-        },
-      ]);
-
-      const ids = customersWithProjects.map((c) => c._id);
-      // Faqat shu `ids` ichidagilarni qidiramiz
-      filter._id = { $in: ids };
-    }
-
     const [customers, totalCount] = await Promise.all([
       this.customerModel
         .find(filter)
@@ -90,7 +209,7 @@ export class CustomerService {
       this.customerModel.countDocuments(filter),
     ]);
 
-    return createApiResponse(200, "Mijozlar ro'yxati muvaffaqiyatli olingan", {
+    return createApiResponse(200, "Mijozlar ro'yxati muvaffaqiyatli olindi", {
       payload: customers,
       total: totalCount,
       limit,
@@ -100,12 +219,24 @@ export class CustomerService {
 
   // ID bo'yicha mijozni olish
   async findOne(id: string) {
+    // Mijozni topish
     const customer = await this.customerModel.findById(id).exec();
     if (!customer)
       throw new NotFoundException(`ID ${id} bo'yicha mijoz topilmadi`);
-    return createApiResponse(200, 'Mijoz muvaffaqiyatli topildi', {
-      payload: customer,
-    });
+
+    // Mijozga tegishli bo'lgan loyihalarni topish
+    const projects = await this.projectModel.find({ customerId: id }).exec();
+
+    return createApiResponse(
+      200,
+      'Mijoz va unga tegishli loyihalar muvaffaqiyatli topildi',
+      {
+        payload: {
+          customer,
+          projects,
+        },
+      },
+    );
   }
 
   // Mijoz ma'lumotlarini yangilash

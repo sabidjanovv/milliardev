@@ -77,12 +77,6 @@ export class CustomerController {
     type: Boolean,
     description: 'active mijozlar',
   })
-  @ApiQuery({
-    name: 'is_done',
-    required: false,
-    type: Boolean,
-    description: 'projectlari qilingan yoki qilinmagan mijozlar',
-  })
   async findAll(@Query() paginationDto: PaginationDto) {
     return this.customerService.findAll(paginationDto);
   }

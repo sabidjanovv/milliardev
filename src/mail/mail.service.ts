@@ -8,7 +8,7 @@ export class MailService {
   constructor(private readonly mailerService: MailerService) {}
 
   async sendMail(admin: Admin) {
-    const url = `${process.env.API_URL}:${process.env.PORT}/api/admin/activate/${admin.activation_link}`;
+    const url = `${process.env.API_URL}/api/admin/activate/${admin.activation_link}`;
     await this.mailerService.sendMail({
       to: admin.email,
       subject: 'Welcome to Milliard Dev',

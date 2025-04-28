@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
   IsIn,
+  IsBoolean,
 } from 'class-validator';
 
 export class PaginationDto {
@@ -15,6 +16,7 @@ export class PaginationDto {
 
   @IsOptional()
   is_active?: boolean;
+
   @IsOptional()
   is_done?: boolean;
 

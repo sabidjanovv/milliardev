@@ -50,7 +50,8 @@ export class ProjectController {
         name: { type: 'string' },
         description: { type: 'string' },
         link: { type: 'string' },
-        developerId: { type: 'string' },
+        is_done:{type: 'boolean'},
+        customerId: { type: 'string' },
         image: { type: 'string', format: 'binary' },
       },
     },
@@ -76,7 +77,7 @@ export class ProjectController {
     if (file) {
       createProjectDto.image = file.filename; // Fayl nomini DTOga saqlash
     }
-    const adminId = req.user.id; 
+    const adminId = req.user.id;
     return this.projectService.create(createProjectDto, adminId, file); // Admin ID bilan loyihani yaratish
   }
 
@@ -101,6 +102,11 @@ export class ProjectController {
     name: 'limit',
     required: false,
     description: 'Sahifadagi elementlar soni (default: 20)',
+  })
+  @ApiQuery({
+    name: 'is_done',
+    required: false,
+    description: 'yakunlangan yoki yakunlanmagan proyektlarni olish',
   })
   async findAll(@Query() paginationDto: PaginationDto) {
     return this.projectService.findAll(paginationDto);
@@ -150,7 +156,6 @@ export class ProjectController {
     }
 
     if (file) {
-      
       if (existingProject.data?.payload.image) {
         const oldImagePath = `./uploads/${existingProject.data.payload.image}`;
         if (fs.existsSync(oldImagePath)) {
@@ -162,10 +167,9 @@ export class ProjectController {
       updateProjectDto.image = file.filename;
     }
 
-    
-    const adminId = req.user.id; 
+    const adminId = req.user.id;
 
-    return this.projectService.update(id, updateProjectDto, adminId); 
+    return this.projectService.update(id, updateProjectDto, adminId);
   }
 
   @Delete(':id')
