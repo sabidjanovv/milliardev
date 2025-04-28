@@ -9,6 +9,7 @@ import { ProjectModule } from './project/project.module';
 import { CustomerModule } from './customer/customer.module';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { BotModule } from './bot/bot.module';
+import { ServicesModule } from './services/services.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { BotModule } from './bot/bot.module';
     ProjectModule,
     CustomerModule,
     BotModule,
+    ServicesModule,
   ],
   controllers: [],
   providers: [],
