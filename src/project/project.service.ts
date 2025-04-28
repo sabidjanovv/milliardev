@@ -109,6 +109,7 @@ export class ProjectService {
     const projects = await this.projectModel
       .find(filter)
       .sort({ _id: 'desc' })
+      .populate('adminId', 'full_name tel_primary email')
       .limit(limit)
       .skip((page - 1) * limit)
       .exec();
