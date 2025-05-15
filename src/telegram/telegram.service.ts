@@ -38,15 +38,8 @@ ${link}
   async sendProjectToUser(userId: string, project: ProjectDocument) {
     const message = this.formatProjectMessage(project);
 
-    if (project.image) {
-      await this.bot.sendPhoto(userId, project.image, {
-        caption: message,
-        parse_mode: 'HTML',
-      });
-    } else {
-      await this.bot.sendMessage(userId, message, {
-        parse_mode: 'HTML',
-      });
-    }
+    await this.bot.sendMessage(userId, message, {
+      parse_mode: 'HTML',
+    });
   }
 }
